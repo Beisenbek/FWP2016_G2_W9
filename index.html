@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="jquery.min.js"></script>
+		<script>
+
+			/*
+				' '      - hidden cell
+				'.'      - empty cell
+				'*'      - bomb
+				'f'      - flag
+				'1'..'8' - number of bombs
+			*/
+
+			var map = [
+				['1','1','1','0'],
+				['1','*','1','0'],
+				['1','1','2','1'],
+				['0','0','1','*'],
+			];
+
+			var n = 4;
+
+			var queuer = [];
+			var queuec = [];
+
+			function showCell(r,c){
+				if(r < 4 && c < 4){
+					if(r >= 0 && c >= 0){
+						var _id = "#" + r + "_" + c;
+						console.log(_id);
+						$(_id).html(map[r][c]);
+						
+						if(map[r][c] == '0'){
+							queuer.push(r);
+							queuec.push(c);
+							map[r][c] = '+';
+						}
+					}
+				}
+
+			}
+
+			function showEmptyCell(r,c){
+				
+				queuer.push(r);
+				queuec.push(c);
+
+				var _id = "#" + r + "_" + c;
+				$(_id).html(map[r][c]);
+				map[r][c] = '+';
+
+				while(queuer.length > 0){
+
+					var tr  = queuer[0];
+					var tc  = queuec[0];
+
+					queuer  = queuer.slice(1);
+					queuec  = queuec.slice(1);
+
+					showCell(tr-1,tc);
+					showCell(tr+1,tc);
+					showCell(tr,tc+1);
+					showCell(tr,tc-1);
+					showCell(tr-1,tc-1);
+					showCell(tr+1,tc+1);
+					showCell(tr-1,tc+1);
+					showCell(tr+1,tc-1);	
+				}
+			}
+
+			$(document).on('click', '.gamecell' , function() {
+				var id = $(this).attr("id");
+				var objs = id.split("_");
+				
+				var r = objs[0];
+				var c = objs[1];
+
+				if(map[r][c] == '*'){
+					//alert("game over!");
+					for(i = 0; i < n; ++i){
+						for(j = 0; j < n; ++j){
+							var _id = "#" + i + "_" + j;
+							$(_id).html(map[i][j]);	
+						}
+					}
+				}
+				else if(map[r][c] == '0'){
+					showEmptyCell(parseInt(r),parseInt(c));
+				}else{
+					$(this).html(map[r][c]);
+				}
+			});
+
+			$(document).ready(function(){
+
+				$("#gameboard").dblclick(function(){
+					var content = "<table>"; 
+
+					for(i = 0; i < 4; i++){
+						content = content + "<tr>";
+						for(j = 0; j < 4; ++j){
+							content = content + "<td  class = 'gamecell' id = " + i + "_" + j+">";
+							content = content + "#";
+							content = content + "</td>";
+						}
+						content = content + "</tr>";
+					}
+					
+					content = content + "</table>";
+
+					$(this).html(content);
+				});				
+			});
+		</script>
+	</head>
+	<body>
+		<div id = "gameboard">start</div>
+	</body>
+</html>
+
